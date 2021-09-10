@@ -24,15 +24,17 @@ function setup() {
 function draw() {
     background(0);
     countCursorDistance();
+    console.log(planeOffsetX, planeOffsetY);
     for (const blob of blobs) {
         blob.x += planeOffsetX;
         blob.y += planeOffsetY;
 
-        if(blob.isOutOfView()) {
-            moveBlobToRandomCoordinate(blob);
+        if (blob.isOutOfView()) {
+            moveBlobBasedOnOffset(blob);
         }
+
         if (mainBlob.isIntersect(blob)) {
-            moveBlobToRandomCoordinate(blob);
+            moveBlobBasedOnOffset(blob);
             mainBlob.grow();
         }
 
@@ -51,7 +53,32 @@ function countCursorDistance() {
     planeOffsetY = distVector.y * -1;
 }
 
-function moveBlobToRandomCoordinate(blob) {
-    blob.x = random(blob.radius, windowWidth - blob.radius);
-    blob.y = random(blob.radius, windowHeight - blob.radius);
+function moveBlobBasedOnOffset(blob) {
+    if (planeOffsetY > 0 && planeOffsetX > 0) {
+        // generate random to left top
+        if (random(0, 100) > 50) {
+            blob.x = 0;
+            blob.y = random(0, windowHeight / 2);
+        } else {
+            blob.x = random(0, windowWidth / 2);
+            blob.y = 0;
+        }
+    } else if (planeOffsetY < 0 && planeOffsetX > 0) {
+        // generate random to left side
+        blob.x = random(0, windowWidth - blob.radius);
+        blob.y = windowHeight;
+    } else if (planeOffsetY > 0 && planeOffsetX < 0) {
+        // generate random to right side
+        blob.x = windowWidth;
+        blob.y = random(0, windowHeight - blob.radius);
+    } else {
+        // generate random to bottom right
+        if (random(0, 100) > 50) {
+            blob.x = windowWidth;
+            blob.y = random(windowHeight / 2, windowHeight);
+        } else {
+            blob.x = random(windowWidth / 2, windowWidth);
+            blob.y = windowHeight;
+        }
+    }
 }

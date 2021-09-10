@@ -1,59 +1,57 @@
+let planeOffsetX = 0;
+let planeOffsetY = 0;
+
 let blobs = [];
 let mainBlob;
 
 function setup() {
     createCanvas(windowWidth, windowHeight).parent('container');
 
-    const radius = 50;
-    const xPos = windowWidth / 2 - radius;
-    const yPos = windowHeight / 2 - radius;
+    let radius = 50;
+    let xPos = windowWidth / 2 - radius;
+    let yPos = windowHeight / 2 - radius;
     mainBlob = new Blob(xPos, yPos, radius);
     mainBlob.isMainBlob = true;
 
-    for (let i = 0; i < 10; i++) {
-        generateRandomBlob();
+    radius = 30;
+    for (let i = 0; i < 20; i++) {
+        xPos = random(radius, windowWidth - radius);
+        yPos = random(radius, windowHeight - radius);
+        blobs.push(new Blob(xPos, yPos, radius));
     }
 }
 
 function draw() {
+    background(0);
+    countCursorDistance();
     for (const blob of blobs) {
+        blob.x += planeOffsetX;
+        blob.y += planeOffsetY;
+
+        if(blob.isOutOfView()) {
+            moveBlobToRandomCoordinate(blob);
+        }
+        if (mainBlob.isIntersect(blob)) {
+            moveBlobToRandomCoordinate(blob);
+            mainBlob.grow();
+        }
+
         blob.draw();
     }
-    countCursorDistance();
+    mainBlob.draw();
 }
 
 function countCursorDistance() {
-    mainBlob.unDraw();
-
     const xPos = mouseX - mainBlob.x;
     const yPos = mouseY - mainBlob.y;
     const distVector = createVector(xPos, yPos);
     distVector.normalize();
     distVector.mult(3);
-    mainBlob.move(distVector.x, distVector.y);
-
-    for (let blob of blobs) {
-        if (!mainBlob.isIntersect(blob)) {
-            continue;
-        }
-        blob.unDraw();
-        removeElementFromArray(blobs, blob);
-        mainBlob.grow();
-        generateRandomBlob();
-    }
-
-    mainBlob.draw();
+    planeOffsetX = distVector.x * -1;
+    planeOffsetY = distVector.y * -1;
 }
 
-function generateRandomBlob() {
-    const radius = 30;
-    const xPos = random(radius, windowWidth - radius);
-    const yPos = random(radius, windowHeight - radius);
-    const blob = new Blob(xPos, yPos, radius);
-    blob.draw();
-    blobs.push(blob);
-}
-
-function removeElementFromArray(array, element) {
-    array.splice(array.indexOf(element), 1);
+function moveBlobToRandomCoordinate(blob) {
+    blob.x = random(blob.radius, windowWidth - blob.radius);
+    blob.y = random(blob.radius, windowHeight - blob.radius);
 }

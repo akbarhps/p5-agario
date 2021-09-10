@@ -10,9 +10,8 @@ class Blob {
         this.radius = radius;
     }
 
-    move(xSpeed, ySpeed) {
-        this.x += xSpeed;
-        this.y += ySpeed;
+    isOutOfView() {
+        return this.x < 0 || this.x > windowWidth || this.y < 0 || this.y > windowHeight;
     }
 
     isIntersect(blob) {
@@ -26,7 +25,7 @@ class Blob {
     }
 
     grow() {
-        this.radius += 5;
+        this.radius += 2.5;
     }
 
     draw() {
@@ -35,11 +34,6 @@ class Blob {
         } else {
             fill(255);
         }
-        circle(this.x, this.y, this.radius);
-    }
-
-    unDraw() {
-        fill(0);
         circle(this.x, this.y, this.radius);
     }
 }
